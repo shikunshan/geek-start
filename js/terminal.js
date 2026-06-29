@@ -10,6 +10,7 @@ const Terminal = {
   currentInput: '',
   isProcessing: false,
   inputCallback: null,
+  inputInterceptor: null,
   ctrlCPressed: false,
 
   init() {
@@ -75,6 +76,13 @@ const Terminal = {
     this.hiddenInput.value = '';
     this.updateInputDisplay();
     this.historyIndex = this.history.length;
+
+    if (this.inputInterceptor) {
+      const intercepted = this.inputInterceptor(input);
+      if (intercepted === true) {
+        return;
+      }
+    }
 
     if (this.inputCallback) {
       this.inputCallback(input);
