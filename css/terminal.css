@@ -1,0 +1,238 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  position: relative;
+}
+
+#background-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  z-index: 0;
+  filter: brightness(0.4) saturate(0.8);
+}
+
+#background-overlay.active {
+  opacity: 1;
+}
+
+#scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.3;
+}
+
+#terminal-container {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dim-color) transparent;
+}
+
+#terminal-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+#terminal-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#terminal-container::-webkit-scrollbar-thumb {
+  background-color: var(--dim-color);
+  border-radius: 4px;
+}
+
+#terminal-output {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.line {
+  margin: 0;
+  padding: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.line.prompt-line {
+  color: var(--prompt-color);
+}
+
+.line.error {
+  color: var(--error-color);
+}
+
+.line.success {
+  color: var(--success-color);
+}
+
+.line.warning {
+  color: var(--warning-color);
+}
+
+.line.info {
+  color: var(--info-color);
+}
+
+.line.highlight {
+  color: var(--highlight-color);
+}
+
+.line.dim {
+  color: var(--dim-color);
+}
+
+.line a {
+  color: var(--link-color);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.line a:hover {
+  opacity: 0.8;
+}
+
+#terminal-input-line {
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+}
+
+#prompt {
+  color: var(--prompt-color);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+#input-text {
+  color: var(--text-color);
+  white-space: pre;
+  flex: 1;
+}
+
+#cursor {
+  color: var(--cursor-color);
+  animation: blink 1s step-end infinite;
+  margin-left: 1px;
+  flex-shrink: 0;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+#hidden-input {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ascii-art {
+  font-family: 'Courier New', monospace;
+  line-height: 1.2;
+  white-space: pre;
+  font-size: 12px;
+}
+
+.bookmark-item {
+  display: flex;
+  gap: 16px;
+  padding: 2px 0;
+}
+
+.bookmark-index {
+  color: var(--dim-color);
+  min-width: 30px;
+}
+
+.bookmark-name {
+  color: var(--info-color);
+  min-width: 150px;
+}
+
+.bookmark-url {
+  color: var(--dim-color);
+  font-size: 13px;
+}
+
+.help-item {
+  display: flex;
+  gap: 16px;
+  padding: 2px 0;
+}
+
+.help-name {
+  color: var(--info-color);
+  min-width: 200px;
+}
+
+.help-desc {
+  color: var(--text-color);
+}
+
+.help-alias {
+  color: var(--dim-color);
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.neofetch-box {
+  border: 1px solid var(--dim-color);
+  padding: 8px 16px;
+  display: inline-block;
+}
+
+.neofetch-line {
+  padding: 2px 0;
+}
+
+.neofetch-label {
+  color: var(--info-color);
+}

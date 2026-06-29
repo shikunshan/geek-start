@@ -1,0 +1,89 @@
+:root {
+  --bg-color: #000000;
+  --text-color: #00ff00;
+  --prompt-color: #00ff00;
+  --error-color: #ff5555;
+  --success-color: #50fa7b;
+  --warning-color: #f1fa8c;
+  --info-color: #8be9fd;
+  --highlight-color: #ff79c6;
+  --dim-color: #6272a4;
+  --selection-bg: #44475a;
+  --cursor-color: #00ff00;
+  --link-color: #8be9fd;
+}
+
+.theme-default {
+  --bg-color: #000000;
+  --text-color: #00ff00;
+  --prompt-color: #00ff00;
+  --error-color: #ff4444;
+  --success-color: #00ff00;
+  --warning-color: #ffff00;
+  --info-color: #00ffff;
+  --highlight-color: #ff00ff;
+  --dim-color: #555555;
+  --selection-bg: #333333;
+  --cursor-color: #00ff00;
+  --link-color: #00ffff;
+}
+
+.theme-nord {
+  --bg-color: #2e3440;
+  --text-color: #d8dee9;
+  --prompt-color: #88c0d0;
+  --error-color: #bf616a;
+  --success-color: #a3be8c;
+  --warning-color: #ebcb8b;
+  --info-color: #88c0d0;
+  --highlight-color: #b48ead;
+  --dim-color: #4c566a;
+  --selection-bg: #3b4252;
+  --cursor-color: #88c0d0;
+  --link-color: #88c0d0;
+}
+
+.theme-dracula {
+  --bg-color: #282a36;
+  --text-color: #f8f8f2;
+  --prompt-color: #50fa7b;
+  --error-color: #ff5555;
+  --success-color: #50fa7b;
+  --warning-color: #f1fa8c;
+  --info-color: #8be9fd;
+  --highlight-color: #ff79c6;
+  --dim-color: #6272a4;
+  --selection-bg: #44475a;
+  --cursor-color: #50fa7b;
+  --link-color: #8be9fd;
+}
+
+.theme-gruvbox {
+  --bg-color: #282828;
+  --text-color: #ebdbb2;
+  --prompt-color: #98971a;
+  --error-color: #cc241d;
+  --success-color: #98971a;
+  --warning-color: #d79921;
+  --info-color: #458588;
+  --highlight-color: #b16286;
+  --dim-color: #665c54;
+  --selection-bg: #3c3836;
+  --cursor-color: #98971a;
+  --link-color: #458588;
+}
+
+.theme-monokai {
+  --bg-color: #272822;
+  --text-color: #f8f8f2;
+  --prompt-color: #a6e22e;
+  --error-color: #f92672;
+  --success-color: #a6e22e;
+  --warning-color: #e6db74;
+  --info-color: #66d9ef;
+  --highlight-color: #ae81ff;
+  --dim-color: #75715e;
+  --selection-bg: #3e3d32;
+  --cursor-color: #a6e22e;
+  --link-color: #66d9ef;
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeekStart - 极客终端导航</title>
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/terminal.css">
+</head>
+<body class="theme-default">
+  <div id="background-overlay"></div>
+  <div id="scanlines"></div>
+  <div id="terminal-container">
+    <div id="terminal-output"></div>
+    <div id="terminal-input-line">
+      <span id="prompt">&gt;</span>
+      <span id="input-text"></span>
+      <span id="cursor">▌</span>
+    </div>
+    <input type="text" id="hidden-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  </div>
+  <audio id="bg-audio" loop></audio>
+
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/command.js"></script>
+  <script src="js/commands/help.js"></script>
+  <script src="js/commands/background.js"></script>
+  <script src="js/commands/bookmarks.js"></script>
+  <script src="js/commands/search.js"></script>
+  <script src="js/commands/music.js"></script>
+  <script src="js/commands/system.js"></script>
+  <script src="js/commands/theme.js"></script>
+  <script src="js/commands/config.js"></script>
+  <script src="js/commands/easter.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      GeekStart.init();
+    });
+  </script>
+</body>
+</html>
