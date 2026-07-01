@@ -70,7 +70,6 @@ const Terminal = {
     }
 
     this.addToHistory(input);
-    this.printPromptWithInput(input);
 
     this.currentInput = '';
     this.hiddenInput.value = '';
@@ -83,6 +82,8 @@ const Terminal = {
         return;
       }
     }
+
+    this.printPromptWithInput(input);
 
     if (this.inputCallback) {
       this.inputCallback(input);
