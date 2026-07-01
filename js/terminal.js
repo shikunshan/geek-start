@@ -131,12 +131,6 @@ const Terminal = {
     this.updateInputDisplay();
     this.historyIndex = this.history.length;
 
-    if (typeof CSSArt !== 'undefined' && CSSArt.currentAnimation) {
-      CSSArt.stopAnimation();
-      this.printPrompt();
-      return;
-    }
-
     this.printPrompt();
   },
 
@@ -158,7 +152,7 @@ const Terminal = {
     const line = document.createElement('div');
     line.className = 'line ' + className;
     if (typeof text === 'string') {
-      line.innerHTML = Utils.escapeHtml(text);
+      line.innerHTML = text === '' ? '&nbsp;' : Utils.escapeHtml(text);
     } else if (text instanceof HTMLElement) {
       line.appendChild(text);
     }
@@ -185,7 +179,6 @@ const Terminal = {
   },
 
   printPromptWithInput(input) {
-    this.println('', '');
     const line = document.createElement('div');
     line.className = 'line prompt-line';
     line.innerHTML = `<span style="color: var(--prompt-color);">&gt;</span> <span>${Utils.escapeHtml(input)}</span>`;

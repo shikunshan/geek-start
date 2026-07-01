@@ -20,7 +20,6 @@ const SystemInfo = {
       os,
       resolution,
       uptime,
-      bookmarks: BookmarkManager.getAll().length,
       theme: config.theme || "default",
     };
   },
@@ -56,7 +55,6 @@ CommandRegistry.register({
         `<div class="neofetch-line"><span class="neofetch-label">系统:</span> ${Utils.escapeHtml(info.os)}</div>` +
         `<div class="neofetch-line"><span class="neofetch-label">分辨率:</span> ${Utils.escapeHtml(info.resolution)}</div>` +
         `<div class="neofetch-line"><span class="neofetch-label">运行时间:</span> ${Utils.escapeHtml(info.uptime)}</div>` +
-        `<div class="neofetch-line"><span class="neofetch-label">书签数量:</span> ${info.bookmarks}</div>` +
         `<div class="neofetch-line"><span class="neofetch-label">主题:</span> ${Utils.escapeHtml(info.theme)}</div>` +
         `</div>`,
     );
