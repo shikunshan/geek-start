@@ -19,24 +19,6 @@ const EasterEggs = {
 };
 
 CommandRegistry.register({
-  name: "sudo",
-  alias: [],
-  description: "以超级用户权限执行命令",
-  usage: "sudo <command>",
-  handler: async (args) => {
-    const fullCmd = args.join(" ");
-    if (fullCmd === "rm -rf /") {
-      Terminal.println("Password: ", "");
-      setTimeout(() => {
-        Terminal.println("Permission denied (nice try)", "error");
-      }, 500);
-    } else {
-      Terminal.println(`${args.join(" ")}: Permission denied`, "error");
-    }
-  },
-});
-
-CommandRegistry.register({
   name: "fortune",
   alias: [],
   description: "随机显示一句格言",

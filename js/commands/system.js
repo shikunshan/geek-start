@@ -28,7 +28,7 @@ const SystemInfo = {
 
 CommandRegistry.register({
   name: "neofetch",
-  alias: ["neo"],
+  alias: [],
   description: "显示系统信息",
   usage: "neofetch",
   handler: async () => {

@@ -89,9 +89,14 @@ CommandRegistry.register({
   name: "search",
   alias: ["s", "find"],
   description: "网页搜索",
-  usage: "search <关键词>",
+  usage: "search [引擎] <关键词>",
   handler: async (args) => {
     if (args.length === 0) {
+      const defaultKey = SearchEngine.getDefaultEngine();
+      const defaultEngine = SearchEngine.engines[defaultKey];
+      Terminal.println('当前状态:', 'info');
+      Terminal.println(`  默认引擎: ${defaultEngine.name} (${defaultKey})`, '');
+      Terminal.println('');
       Terminal.println("可用引擎:", "info");
       SearchEngine.listEngines().forEach((e) => {
         Terminal.println(
@@ -100,7 +105,7 @@ CommandRegistry.register({
         );
       });
       Terminal.println('');
-      Terminal.println('用法: search <关键词>', 'dim');
+      Terminal.println('用法: search <关键词>  |  search <引擎> <关键词>', 'dim');
       return;
     }
 

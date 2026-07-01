@@ -54,7 +54,7 @@ CommandRegistry.register({
 
 CommandRegistry.register({
   name: 'history',
-  alias: ['hist'],
+  alias: [],
   description: '显示命令历史',
   usage: 'history [count]',
   handler: async (args) => {

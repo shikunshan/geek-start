@@ -17,7 +17,6 @@
 - **CSS 动画**：圣诞树、星夜等 CSS 艺术动画
 
 ### 彩蛋命令
-- `sudo rm -rf /` - 试试就知道了
 - `fortune` - 随机格言
 - `hack` - 模拟黑客入侵
 
@@ -94,21 +93,19 @@ ai status
 |------|------|------|
 | `help` | `h`, `?` | 显示帮助信息 |
 | `clear` | `cls` | 清屏 |
-| `history` | `hist` | 显示命令历史 |
+| `history` | - | 显示命令历史 |
 | `theme` | `t` | 切换主题 |
 | `background` | `bg` | 切换背景 |
-| `bookmarks` | `bm` | 管理书签 |
-| `open` | `o` | 打开书签 |
+| `bookmarks` | `bm` | 书签管理（打开浏览器书签/添加快捷书签） |
 | `search` | `s`, `find` | 网页搜索 |
 | `music` | `m` | 音乐播放器 |
-| `neofetch` | `neo` | 显示系统信息 |
+| `neofetch` | - | 显示系统信息 |
 | `uptime` | - | 运行时间 |
 | `date` | `time` | 当前时间 |
 | `ai` | - | AI 对话助手 |
-| `css` | - | CSS 动画艺术 |
+| `css` | `cssart`, `animation` | CSS 动画艺术（按 Ctrl+C 停止） |
 | `fortune` | - | 随机格言 |
 | `hack` | - | 模拟入侵 |
-| `sudo` | - | 彩蛋命令 |
 
 ## ⌨️ 快捷键
 
@@ -117,7 +114,7 @@ ai status
 | `↑` / `↓` | 浏览历史命令 |
 | `Tab` | 自动补全命令 |
 | `Ctrl + L` | 清屏 |
-| `Ctrl + C` | 取消当前输入 |
+| `Ctrl + C` | 取消当前输入 / 停止 CSS 动画 |
 
 ## 🎨 主题预览
 

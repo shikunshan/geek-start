@@ -22,6 +22,10 @@ const MusicPlayer = {
       return true;
     }
 
+    if (this.isPlaying) {
+      this.stop();
+    }
+
     this.audioEl.src = trackPath;
     this.audioEl.loop = true;
     this.audioEl.play().then(() => {
@@ -29,6 +33,8 @@ const MusicPlayer = {
       this.currentTrack = name;
     }).catch(e => {
       console.error('播放失败:', e);
+      this.isPlaying = false;
+      this.currentTrack = null;
     });
 
     this.currentTrack = name;

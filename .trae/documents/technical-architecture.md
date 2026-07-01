@@ -22,8 +22,7 @@ graph TD
     E --> E5["music.js 音乐命令"]
     E --> E6["system.js 系统命令"]
     E --> E7["theme.js 主题命令"]
-    E --> E8["config.js 配置命令"]
-    E --> E9["easter.js 彩蛋命令"]
+    E --> E8["easter.js 彩蛋命令"]
     
     F --> H["localStorage 浏览器存储"]
     
@@ -139,7 +138,12 @@ CommandRegistry.list()           // 获取所有命令列表
 
 ### 4.5 书签数据结构
 
-```json
+书签系统现在支持两种模式：
+1. **浏览器书签**：通过 `bookmarks` 命令直接打开浏览器书签管理器页面
+2. **快捷书签**：用户手动添加的快捷书签，存储在 localStorage 中
+
+```javascript
+// 快捷书签数据结构
 {
   "bookmarks": [
     { "name": "GitHub", "url": "https://github.com" },

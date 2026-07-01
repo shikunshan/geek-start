@@ -1,30 +1,28 @@
-CommandRegistry.register({
-  name: 'css',
-  alias: ['cssart', 'animation'],
-  description: 'CSS 动画艺术',
-  usage: 'css [christmas|starnight]',
-  handler: async (args) => {
-    if (args.length === 0 || args[0] === 'christmas') {
-      this.showChristmasTree();
-      return;
+const CSSArt = {
+  currentAnimation: null,
+  animationElement: null,
+
+  stopAnimation() {
+    if (this.animationElement) {
+      this.animationElement.remove();
+      this.animationElement = null;
     }
-
-    const subCmd = args[0].toLowerCase();
-
-    if (subCmd === 'starnight' || subCmd === 'starry' || subCmd === 'night') {
-      this.showStarryNight();
-      return;
+    if (this.animationStyle) {
+      this.animationStyle.remove();
+      this.animationStyle = null;
     }
-
-    Terminal.println('可用动画:', 'info');
-    Terminal.println('  christmas  - 圣诞树动画', '');
-    Terminal.println('  starnight  - 星夜动画', '');
+    this.currentAnimation = null;
     Terminal.println('');
-    Terminal.println('用法: css christmas', 'dim');
+    Terminal.println('动画已停止', 'warning');
   },
 
   showChristmasTree() {
-    Terminal.println('');
+    if (this.currentAnimation) {
+      this.stopAnimation();
+    }
+
+    this.currentAnimation = 'christmas';
+
     const tree = `
            ★
           /|\\
@@ -54,27 +52,33 @@ CommandRegistry.register({
       font-size: 14px;
       line-height: 1.2;
       animation: treeGlow 2s ease-in-out infinite;
+      margin: 10px 0;
     `;
     pre.textContent = tree;
 
-    const style = document.createElement('style');
-    style.id = 'christmas-style';
-    style.textContent = `
+    this.animationStyle = document.createElement('style');
+    this.animationStyle.textContent = `
       @keyframes treeGlow {
         0%, 100% { filter: brightness(1); }
         50% { filter: brightness(1.3) hue-rotate(20deg); }
       }
     `;
-    document.head.appendChild(style);
-    Terminal.printHtml(pre);
+    document.head.appendChild(this.animationStyle);
+
+    Terminal.printElement(pre);
+    this.animationElement = pre;
 
     Terminal.println('');
-    Terminal.println('🎄 圣诞树动画已显示！', 'success');
+    Terminal.println('🎄 圣诞树动画播放中，按 Ctrl+C 停止', 'success');
     Terminal.println('');
   },
 
   showStarryNight() {
-    Terminal.println('');
+    if (this.currentAnimation) {
+      this.stopAnimation();
+    }
+
+    this.currentAnimation = 'starnight';
 
     const container = document.createElement('div');
     container.style.cssText = `
@@ -116,19 +120,46 @@ CommandRegistry.register({
     `;
     container.appendChild(moon);
 
-    const style = document.createElement('style');
-    style.id = 'starnight-style';
-    style.textContent = `
+    this.animationStyle = document.createElement('style');
+    this.animationStyle.textContent = `
       @keyframes twinkle {
         0%, 100% { opacity: 0.3; transform: scale(1); }
         50% { opacity: 1; transform: scale(1.5); }
       }
     `;
-    document.head.appendChild(style);
+    document.head.appendChild(this.animationStyle);
 
-    Terminal.printHtml(container);
+    Terminal.printElement(container);
+    this.animationElement = container;
+
     Terminal.println('');
-    Terminal.println('🌌 星夜动画已显示！', 'success');
+    Terminal.println('🌌 星夜动画播放中，按 Ctrl+C 停止', 'success');
     Terminal.println('');
+  }
+};
+
+CommandRegistry.register({
+  name: 'css',
+  alias: ['cssart', 'animation'],
+  description: 'CSS 动画艺术',
+  usage: 'css [christmas|starnight]',
+  handler: async (args) => {
+    if (args.length === 0 || args[0] === 'christmas') {
+      CSSArt.showChristmasTree();
+      return;
+    }
+
+    const subCmd = args[0].toLowerCase();
+
+    if (subCmd === 'starnight' || subCmd === 'starry' || subCmd === 'night') {
+      CSSArt.showStarryNight();
+      return;
+    }
+
+    Terminal.println('可用动画:', 'info');
+    Terminal.println('  christmas  - 圣诞树动画', '');
+    Terminal.println('  starnight  - 星夜动画', '');
+    Terminal.println('');
+    Terminal.println('用法: css christmas  |  css starnight', 'dim');
   }
 });

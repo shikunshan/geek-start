@@ -87,6 +87,8 @@ const Terminal = {
     if (this.inputCallback) {
       this.inputCallback(input);
     }
+
+    this.println('', '');
   },
 
   navigateHistory(direction) {
@@ -128,6 +130,13 @@ const Terminal = {
     this.hiddenInput.value = '';
     this.updateInputDisplay();
     this.historyIndex = this.history.length;
+
+    if (typeof CSSArt !== 'undefined' && CSSArt.currentAnimation) {
+      CSSArt.stopAnimation();
+      this.printPrompt();
+      return;
+    }
+
     this.printPrompt();
   },
 
@@ -161,11 +170,22 @@ const Terminal = {
     this.print(text, className);
   },
 
+  printElement(element, className = '') {
+    const line = document.createElement('div');
+    line.className = 'line ' + className;
+    if (element instanceof HTMLElement) {
+      line.appendChild(element);
+    }
+    this.outputEl.appendChild(line);
+    this.scrollToBottom();
+  },
+
   printPrompt() {
     this.println('', '');
   },
 
   printPromptWithInput(input) {
+    this.println('', '');
     const line = document.createElement('div');
     line.className = 'line prompt-line';
     line.innerHTML = `<span style="color: var(--prompt-color);">&gt;</span> <span>${Utils.escapeHtml(input)}</span>`;
