@@ -148,7 +148,6 @@ body {
 #input-text {
   color: var(--text-color);
   white-space: pre;
-  flex: 1;
 }
 
 #cursor {
