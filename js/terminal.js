@@ -87,8 +87,6 @@ const Terminal = {
     if (this.inputCallback) {
       this.inputCallback(input);
     }
-
-    this.println('', '');
   },
 
   navigateHistory(direction) {
@@ -179,6 +177,7 @@ const Terminal = {
   },
 
   printPromptWithInput(input) {
+    this.println('', '');
     const line = document.createElement('div');
     line.className = 'line prompt-line';
     line.innerHTML = `<span style="color: var(--prompt-color);">&gt;</span> <span>${Utils.escapeHtml(input)}</span>`;
@@ -263,6 +262,5 @@ const GeekStart = {
     Terminal.println('');
     Terminal.println('输入 help 查看所有可用命令', 'dim');
     Terminal.println('快捷键: ↑↓ 浏览历史 | Tab 自动补全 | Ctrl+L 清屏', 'dim');
-    Terminal.println('');
   }
 };

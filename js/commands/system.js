@@ -58,7 +58,6 @@ CommandRegistry.register({
         `<div class="neofetch-line"><span class="neofetch-label">主题:</span> ${Utils.escapeHtml(info.theme)}</div>` +
         `</div>`,
     );
-    Terminal.println("");
   },
 });
 
