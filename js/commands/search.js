@@ -1,45 +1,35 @@
 const SearchEngine = {
   engines: {
     google: {
-      name: 'Google',
-      url: 'https://www.google.com/search?q=',
-      prefixes: ['g', 'google']
+      name: "Google",
+      url: "https://www.google.com/search?q=",
+      prefixes: ["g", "google"],
     },
     github: {
-      name: 'GitHub',
-      url: 'https://github.com/search?q=',
-      prefixes: ['gh', 'github']
+      name: "GitHub",
+      url: "https://github.com/search?q=",
+      prefixes: ["gh", "github"],
     },
     npm: {
-      name: 'npm',
-      url: 'https://www.npmjs.com/search?q=',
-      prefixes: ['npm']
-    },
-    duckduckgo: {
-      name: 'DuckDuckGo',
-      url: 'https://duckduckgo.com/?q=',
-      prefixes: ['ddg', 'duckduckgo']
-    },
-    arxiv: {
-      name: 'arXiv',
-      url: 'https://arxiv.org/search/?query=',
-      prefixes: ['arxiv']
+      name: "npm",
+      url: "https://www.npmjs.com/search?q=",
+      prefixes: ["npm"],
     },
     bing: {
-      name: 'Bing',
-      url: 'https://www.bing.com/search?q=',
-      prefixes: ['bing']
+      name: "Bing",
+      url: "https://www.bing.com/search?q=",
+      prefixes: ["bing"],
     },
     baidu: {
-      name: '百度',
-      url: 'https://www.baidu.com/s?wd=',
-      prefixes: ['bd', 'baidu']
-    }
+      name: "百度",
+      url: "https://www.baidu.com/s?wd=",
+      prefixes: ["bd", "baidu"],
+    },
   },
 
   getDefaultEngine() {
-    const config = Storage.get('config', {});
-    return config.defaultSearch || 'google';
+    const config = Storage.get("config", {});
+    return config.defaultSearch || "google";
   },
 
   findEngine(prefix) {
@@ -71,7 +61,7 @@ const SearchEngine = {
         const found = this.findEngine(first);
         if (found) {
           engine = found.engine;
-          searchQuery = parts.slice(1).join(' ');
+          searchQuery = parts.slice(1).join(" ");
         }
       }
     }
@@ -82,35 +72,38 @@ const SearchEngine = {
     }
 
     const url = engine.url + encodeURIComponent(searchQuery);
-    Terminal.println(`正在使用 ${engine.name} 搜索: ${searchQuery}`, 'info');
-    window.open(url, '_blank');
+    Terminal.println(`正在使用 ${engine.name} 搜索: ${searchQuery}`, "info");
+    window.open(url, "_blank");
   },
 
   listEngines() {
-    return Object.keys(this.engines).map(key => ({
+    return Object.keys(this.engines).map((key) => ({
       key,
       name: this.engines[key].name,
-      prefixes: this.engines[key].prefixes
+      prefixes: this.engines[key].prefixes,
     }));
-  }
+  },
 };
 
 CommandRegistry.register({
-  name: 'search',
-  alias: ['s', 'find'],
-  description: '网页搜索',
-  usage: 'search [引擎前缀] <关键词>',
+  name: "search",
+  alias: ["s", "find"],
+  description: "网页搜索",
+  usage: "search [引擎前缀] <关键词>",
   handler: async (args) => {
     if (args.length === 0) {
-      Terminal.println('用法: search [引擎前缀] <关键词>', 'error');
-      Terminal.println('可用引擎:', 'info');
-      SearchEngine.listEngines().forEach(e => {
-        Terminal.println(`  ${e.key} (${e.prefixes.join(', ')}): ${e.name}`, 'dim');
+      Terminal.println("用法: search [引擎前缀] <关键词>", "error");
+      Terminal.println("可用引擎:", "info");
+      SearchEngine.listEngines().forEach((e) => {
+        Terminal.println(
+          `  ${e.key} (${e.prefixes.join(", ")}): ${e.name}`,
+          "dim",
+        );
       });
       return;
     }
 
-    const query = args.join(' ');
+    const query = args.join(" ");
     SearchEngine.search(query);
-  }
+  },
 });

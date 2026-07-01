@@ -44,6 +44,9 @@ graph TD
 ```
 geek-start/
 ├── index.html              # 入口页面
+├── server.js               # Express 后端服务
+├── package.json            # 项目依赖配置
+├── .env.example            # 环境变量示例
 ├── css/
 │   ├── terminal.css        # 终端基础样式
 │   └── themes.css          # 主题样式
@@ -61,10 +64,11 @@ geek-start/
 │       ├── system.js
 │       ├── theme.js
 │       ├── config.js
-│       └── easter.js
+│       ├── easter.js
+│       └── ai.js           # AI 对话模块
 ├── assets/
 │   ├── images/             # 背景图片
-│   └── audio/              # 背景音乐/白噪音
+│   └── audio/              # 背景音乐
 ├── config/
 │   └── default.json        # 默认配置
 └── README.md
