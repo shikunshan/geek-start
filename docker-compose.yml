@@ -2,7 +2,9 @@ version: "3.8"
 
 services:
   geek-start:
-    image: geek-start:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: geek-start
     restart: unless-stopped
     environment:
