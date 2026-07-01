@@ -71,22 +71,29 @@ CommandRegistry.register({
   name: 'background',
   alias: ['bg'],
   description: '切换背景图片',
-  usage: 'background [random|none|<name>]',
+  usage: 'background [名称]',
   handler: async (args) => {
     if (args.length === 0) {
       const current = BackgroundManager.currentImage || 'none';
-      Terminal.println(`当前背景: ${current}`, 'info');
-      Terminal.println(`可用背景: ${BackgroundManager.listImages().join(', ')}`, 'dim');
-      Terminal.println('用法: background random | background sea | background none', 'dim');
+      Terminal.println('当前状态:', 'info');
+      Terminal.println(`  当前背景: ${current}`, '');
+      Terminal.println('');
+      Terminal.println('可用背景:', 'info');
+      BackgroundManager.listImages().forEach(name => {
+        Terminal.println(`  ${name}`, '');
+      });
+      Terminal.println('');
+      Terminal.println('  none    - 纯黑背景', '');
+      Terminal.println('  random  - 随机轮播', '');
+      Terminal.println('');
+      Terminal.println('用法: background <名称>', 'dim');
       return;
     }
 
     const arg = args[0].toLowerCase();
 
     if (arg === 'random') {
-      const config = Storage.get('config', {});
-      const interval = config.backgroundInterval || 30000;
-      BackgroundManager.startRandom(interval);
+      BackgroundManager.startRandom(30000);
       Terminal.println('已开启随机背景轮播', 'success');
       return;
     }

@@ -13,7 +13,8 @@
 - **多引擎搜索**：Google / GitHub / npm / Bing / 百度
 - **音乐播放**：内置音乐播放器
 - **系统信息**：neofetch / uptime 等命令
-- **AI 对话**：内置 AI 助手，支持流式输出，双模式（后端代理 / 前端直连）
+- **AI 对话**：内置 AI 助手，支持流式输出
+- **CSS 动画**：圣诞树、星夜等 CSS 艺术动画
 
 ### 彩蛋命令
 - `sudo rm -rf /` - 试试就知道了
@@ -103,8 +104,8 @@ ai status
 | `neofetch` | `neo` | 显示系统信息 |
 | `uptime` | - | 运行时间 |
 | `date` | `time` | 当前时间 |
-| `config` | `cfg` | 配置管理 |
-| `ai` | `chat`, `gpt` | AI 对话助手 |
+| `ai` | - | AI 对话助手 |
+| `css` | - | CSS 动画艺术 |
 | `fortune` | - | 随机格言 |
 | `hack` | - | 模拟入侵 |
 | `sudo` | - | 彩蛋命令 |

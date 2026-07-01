@@ -4,10 +4,10 @@ const BookmarkManager = {
     { name: 'Gmail', url: 'https://mail.google.com' },
     { name: 'YouTube', url: 'https://www.youtube.com' },
     { name: 'Stack Overflow', url: 'https://stackoverflow.com' },
-    { name: 'MDN', url: 'https://developer.mozilla.org' },
     { name: 'npm', url: 'https://www.npmjs.com' },
-    { name: 'Hacker News', url: 'https://news.ycombinator.com' },
-    { name: 'Reddit', url: 'https://www.reddit.com' }
+    { name: '百度', url: 'https://www.baidu.com' },
+    { name: '掘金', url: 'https://juejin.cn' },
+    { name: '知乎', url: 'https://www.zhihu.com' }
   ],
 
   getAll() {
@@ -46,17 +46,21 @@ const BookmarkManager = {
   findByName(name) {
     const bookmarks = this.getAll();
     const lowerName = name.toLowerCase();
-    return bookmarks.find(b => b.name.toLowerCase() === lowerName);
+    return bookmarks.find(b => b.name.toLowerCase().includes(lowerName));
+  },
+
+  reset() {
+    this.save([...this.defaultBookmarks]);
   }
 };
 
 CommandRegistry.register({
   name: 'bookmarks',
-  alias: ['bm', 'bookmark'],
+  alias: ['bm'],
   description: '管理书签',
-  usage: 'bookmarks [add <name> <url> | rm <index> | list]',
+  usage: 'bookmarks [add <名称> <URL> | rm <编号>]',
   handler: async (args) => {
-    if (args.length === 0 || args[0] === 'list' || args[0] === 'ls') {
+    if (args.length === 0) {
       this.listBookmarks();
       return;
     }
@@ -68,17 +72,17 @@ CommandRegistry.register({
         Terminal.println('用法: bookmarks add <名称> <URL>', 'error');
         return;
       }
-      const name = args[1];
-      let url = args[2];
+      const name = args.slice(1, -1).join(' ');
+      let url = args[args.length - 1];
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         url = 'https://' + url;
       }
       const index = BookmarkManager.add(name, url);
-      Terminal.println(`已添加书签 [${index}]: ${name} - ${url}`, 'success');
+      Terminal.println(`已添加书签 [${index}]: ${name}`, 'success');
       return;
     }
 
-    if (subCmd === 'rm' || subCmd === 'remove' || subCmd === 'del') {
+    if (subCmd === 'rm') {
       if (args.length < 2) {
         Terminal.println('用法: bookmarks rm <编号>', 'error');
         return;
@@ -97,18 +101,24 @@ CommandRegistry.register({
       return;
     }
 
+    if (subCmd === 'reset') {
+      BookmarkManager.reset();
+      Terminal.println('已重置为默认书签', 'success');
+      return;
+    }
+
     Terminal.println(`未知子命令: ${subCmd}`, 'error');
   },
 
   listBookmarks() {
     const bookmarks = BookmarkManager.getAll();
+    Terminal.println('书签列表:', 'info');
+    Terminal.println('');
+
     if (bookmarks.length === 0) {
-      Terminal.println('暂无书签', 'dim');
+      Terminal.println('暂无书签，使用 bookmarks add <名称> <URL> 添加', 'dim');
       return;
     }
-
-    Terminal.println(`书签列表 (共 ${bookmarks.length} 个):`, 'info');
-    Terminal.println('');
 
     bookmarks.forEach((bm, i) => {
       const index = Utils.padLeft(i + 1, 2, ' ');
@@ -122,7 +132,7 @@ CommandRegistry.register({
     });
 
     Terminal.println('');
-    Terminal.println('使用 open <编号> 打开书签', 'dim');
+    Terminal.println('用法: open <编号|名称>  |  bookmarks add <名称> <URL>  |  bookmarks rm <编号>', 'dim');
   }
 });
 
@@ -137,7 +147,7 @@ CommandRegistry.register({
       return;
     }
 
-    const arg = args[0];
+    const arg = args.join(' ');
     let bookmark = null;
 
     const index = parseInt(arg);

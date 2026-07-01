@@ -46,7 +46,7 @@ geek-start/
 ├── index.html              # 入口页面
 ├── server.js               # Express 后端服务
 ├── package.json            # 项目依赖配置
-├── .env.example            # 环境变量示例
+├── .env                    # 环境变量配置
 ├── css/
 │   ├── terminal.css        # 终端基础样式
 │   └── themes.css          # 主题样式
@@ -63,14 +63,12 @@ geek-start/
 │       ├── music.js
 │       ├── system.js
 │       ├── theme.js
-│       ├── config.js
 │       ├── easter.js
+│       ├── css.js           # CSS 动画模块
 │       └── ai.js           # AI 对话模块
 ├── assets/
 │   ├── images/             # 背景图片
 │   └── audio/              # 背景音乐
-├── config/
-│   └── default.json        # 默认配置
 └── README.md
 ```
 

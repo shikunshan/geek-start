@@ -162,7 +162,7 @@ const Terminal = {
   },
 
   printPrompt() {
-    this.print('', '');
+    this.println('', '');
   },
 
   printPromptWithInput(input) {

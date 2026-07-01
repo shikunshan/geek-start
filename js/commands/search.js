@@ -89,17 +89,18 @@ CommandRegistry.register({
   name: "search",
   alias: ["s", "find"],
   description: "网页搜索",
-  usage: "search [引擎前缀] <关键词>",
+  usage: "search <关键词>",
   handler: async (args) => {
     if (args.length === 0) {
-      Terminal.println("用法: search [引擎前缀] <关键词>", "error");
       Terminal.println("可用引擎:", "info");
       SearchEngine.listEngines().forEach((e) => {
         Terminal.println(
           `  ${e.key} (${e.prefixes.join(", ")}): ${e.name}`,
-          "dim",
+          '',
         );
       });
+      Terminal.println('');
+      Terminal.println('用法: search <关键词>', 'dim');
       return;
     }
 

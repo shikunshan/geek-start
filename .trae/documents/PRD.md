@@ -22,9 +22,9 @@ GeekStart 是一个外观与交互完全模仿 Linux 终端的浏览器导航起
 6. **音乐播放**：背景音乐播放控制
 7. **系统状态**：neofetch、uptime、date 等系统信息命令
 8. **主题系统**：多种配色主题（default / nord / dracula / gruvbox / monokai）
-9. **配置系统**：用户配置持久化、默认搜索引擎、用户名等
-10. **彩蛋命令**：sudo rm -rf /、fortune、hack
-11. **AI 对话**：内置 AI 助手，支持流式输出，双模式（后端代理 / 前端直连）
+9. **彩蛋命令**：sudo rm -rf /、fortune、hack
+10. **AI 对话**：内置 AI 助手，支持流式输出
+11. **CSS 动画**：圣诞树、星夜等 CSS 艺术动画
 
 ### 2.2 页面详情
 

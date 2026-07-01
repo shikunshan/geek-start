@@ -41,19 +41,11 @@ const MusicPlayer = {
     this.isPlaying = false;
   },
 
-  toggle() {
-    if (this.isPlaying) {
-      this.pause();
-    } else if (this.currentTrack) {
-      this.audioEl.play();
-      this.isPlaying = true;
-    }
-  },
-
   stop() {
     this.audioEl.pause();
     this.audioEl.currentTime = 0;
     this.isPlaying = false;
+    this.currentTrack = null;
   },
 
   setVolume(vol) {
@@ -70,14 +62,22 @@ CommandRegistry.register({
   name: 'music',
   alias: ['m'],
   description: '音乐播放器',
-  usage: 'music [play <名称>|pause|stop|list|volume <0-1>]',
+  usage: 'music [play <名称>|pause|stop|volume <0-100>]',
   handler: async (args) => {
     if (args.length === 0) {
       const status = MusicPlayer.isPlaying ? '播放中' : '已暂停';
       const track = MusicPlayer.currentTrack || '无';
-      Terminal.println(`状态: ${status}`, 'info');
-      Terminal.println(`当前: ${track}`, 'info');
-      Terminal.println(`音量: ${Math.round(MusicPlayer.audioEl.volume * 100)}%`, 'dim');
+      Terminal.println('当前状态:', 'info');
+      Terminal.println(`  状态: ${status}`, '');
+      Terminal.println(`  当前: ${track}`, '');
+      Terminal.println(`  音量: ${Math.round(MusicPlayer.audioEl.volume * 100)}%`, '');
+      Terminal.println('');
+      Terminal.println('可用音乐:', 'info');
+      MusicPlayer.listTracks().forEach(name => {
+        Terminal.println(`  ${name}`, '');
+      });
+      Terminal.println('');
+      Terminal.println('用法: music play <名称>  |  music pause  |  music stop  |  music volume <0-100>', 'dim');
       return;
     }
 

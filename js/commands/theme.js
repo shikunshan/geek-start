@@ -9,11 +9,6 @@ const ThemeManager = {
     document.body.className = '';
     document.body.classList.add(`theme-${name}`);
     Storage.set('theme', name);
-
-    const config = Storage.get('config', {});
-    config.theme = name;
-    Storage.set('config', config);
-
     return true;
   },
 
@@ -37,12 +32,19 @@ CommandRegistry.register({
   name: 'theme',
   alias: ['t'],
   description: '切换主题',
-  usage: 'theme <名称>|list',
+  usage: 'theme [名称]',
   handler: async (args) => {
     if (args.length === 0) {
       const current = ThemeManager.getCurrentTheme();
-      Terminal.println(`当前主题: ${current}`, 'info');
-      Terminal.println(`可用主题: ${ThemeManager.listThemes().join(', ')}`, 'dim');
+      Terminal.println('当前状态:', 'info');
+      Terminal.println(`  当前主题: ${current}`, '');
+      Terminal.println('');
+      Terminal.println('可用主题:', 'info');
+      ThemeManager.listThemes().forEach(name => {
+        Terminal.println(`  ${name}`, '');
+      });
+      Terminal.println('');
+      Terminal.println('用法: theme <名称>', 'dim');
       return;
     }
 
