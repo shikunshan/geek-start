@@ -1,6 +1,6 @@
 # GeekStart - 极客终端导航页
 
-一个外观与交互完全模仿 Linux 终端的浏览器导航起始页，通过输入命令完成搜索、书签、背景切换、音乐播放等操作，主打极客美学与高效率。
+一个外观与交互完全模仿 Linux 终端的浏览器导航起始页，通过输入命令完成搜索、背景切换、音乐播放等操作，主打极客美学与高效率。
 
 ## ✨ 功能特性
 
@@ -9,12 +9,10 @@
 - **命令历史**：↑↓ 键浏览历史命令，支持 Tab 自动补全
 - **多主题**：内置 default / nord / dracula / gruvbox / monokai 五种配色主题
 - **背景系统**：支持多种背景图片切换，随机轮播模式
-- **书签管理**：添加、删除、快速打开书签
 - **多引擎搜索**：Google / GitHub / npm / Bing / 百度
 - **音乐播放**：内置音乐播放器
 - **系统信息**：neofetch / uptime 等命令
 - **AI 对话**：内置 AI 助手，支持流式输出
-- **CSS 动画**：圣诞树、星夜等 CSS 艺术动画
 
 ### 彩蛋命令
 - `fortune` - 随机格言
@@ -59,10 +57,8 @@ ai status
 
 | 命令 | 描述 |
 |------|------|
-| `/exit`, `/quit`, `/q` | 退出对话模式 |
-| `/clear`, `/reset` | 清空对话上下文 |
-| `/help`, `/?` | 显示帮助 |
-| `/status` | 查看当前配置状态 |
+| `/exit`, `/quit` | 退出对话模式 |
+| `/clear` | 清空对话上下文 |
 | `Ctrl+C` | 中断 AI 生成 |
 
 ### 运行模式
@@ -96,16 +92,14 @@ ai status
 | `history` | - | 显示命令历史 |
 | `theme` | `t` | 切换主题 |
 | `background` | `bg` | 切换背景 |
-| `bookmarks` | `bm` | 书签管理（打开浏览器书签/添加快捷书签） |
 | `search` | `s`, `find` | 网页搜索 |
 | `music` | `m` | 音乐播放器 |
 | `neofetch` | - | 显示系统信息 |
 | `uptime` | - | 运行时间 |
 | `date` | `time` | 当前时间 |
 | `ai` | - | AI 对话助手 |
-| `css` | `cssart`, `animation` | CSS 动画艺术（按 Ctrl+C 停止） |
 | `fortune` | - | 随机格言 |
-| `hack` | - | 模拟入侵 |
+| `hack` | - | 模拟入侵（按 Ctrl+C 停止） |
 
 ## ⌨️ 快捷键
 
@@ -114,7 +108,7 @@ ai status
 | `↑` / `↓` | 浏览历史命令 |
 | `Tab` | 自动补全命令 |
 | `Ctrl + L` | 清屏 |
-| `Ctrl + C` | 取消当前输入 / 停止 CSS 动画 |
+| `Ctrl + C` | 取消当前输入 / 停止动画 / 中断 AI 生成 |
 
 ## 🎨 主题预览
 
@@ -129,6 +123,7 @@ ai status
 ```
 geek-start/
 ├── index.html              # 入口页面
+├── server.js               # Express 静态服务 + AI 流式代理
 ├── css/
 │   ├── terminal.css        # 终端基础样式
 │   └── themes.css          # 主题样式
@@ -144,6 +139,12 @@ geek-start/
 └── config/
     └── default.json        # 默认配置
 ```
+
+## 🔒 安全说明
+
+- `.env` 已加入 `.gitignore`，切勿将真实 API Key 提交到 git
+- `/api/chat` 默认限流：每 IP 每分钟 20 次（可通过 `CHAT_RATE_LIMIT` 调整）
+- 跨域默认关闭，如需开放请设置 `ALLOWED_ORIGINS`
 
 ## 🔧 技术栈
 

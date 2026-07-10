@@ -1,8 +1,17 @@
 const Utils = {
+  ASCII_BANNER: [
+    '██████╗ ███████╗███████╗██╗  ██╗███████╗████████╗ █████╗ ██████╗ ████████╗',
+    '██╔══██╗██╔════╝██╔════╝██║ ██╔╝██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝',
+    '██████╔╝█████╗  █████╗  █████╔╝ ███████╗   ██║   ███████║██████╔╝   ██║   ',
+    '██╔══██╗██╔══╝  ██╔══╝  ██╔═██╗ ╚════██║   ██║   ██╔══██║██╔══██╗   ██║   ',
+    '██║  ██║███████╗███████╗██║  ██╗███████║   ██║   ██║  ██║██║  ██║   ██║   ',
+    '╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   '
+  ],
+
+  _htmlEscapes: { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' },
+
   escapeHtml(str) {
-    const div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
-    return div.innerHTML;
+    return String(str).replace(/[&<>"']/g, ch => Utils._htmlEscapes[ch]);
   },
 
   formatTime(seconds) {
@@ -17,44 +26,12 @@ const Utils = {
     return `${s}s`;
   },
 
-  formatDate(date) {
-    const d = new Date(date);
-    return d.toLocaleString('zh-CN');
-  },
-
-  randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  },
-
   randomFromArray(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   },
 
-  debounce(fn, delay) {
-    let timer = null;
-    return function(...args) {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn.apply(this, args), delay);
-    };
-  },
-
-  throttle(fn, limit) {
-    let inThrottle;
-    return function(...args) {
-      if (!inThrottle) {
-        fn.apply(this, args);
-        inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
-      }
-    };
-  },
-
   padLeft(str, len, char = ' ') {
     return String(str).padStart(len, char);
-  },
-
-  padRight(str, len, char = ' ') {
-    return String(str).padEnd(len, char);
   },
 
   getBrowserInfo() {

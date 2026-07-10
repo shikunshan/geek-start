@@ -2,9 +2,10 @@ const MusicPlayer = {
   audioEl: null,
   currentTrack: null,
   isPlaying: false,
+  // ASCII 文件名避免 URL 编码问题，显示名保留中文
   tracks: {
-    '晴天': 'assets/audio/晴天.mp3',
-    '青花瓷': 'assets/audio/青花瓷.mp3'
+    '晴天': 'assets/audio/qingtian.mp3',
+    '青花瓷': 'assets/audio/qinghuaci.mp3'
   },
 
   init() {
@@ -28,18 +29,17 @@ const MusicPlayer = {
 
     this.audioEl.src = trackPath;
     this.audioEl.loop = true;
-    this.audioEl.play().then(() => {
+    // State is only committed after play() resolves (autoplay policy may reject it)
+    return this.audioEl.play().then(() => {
       this.isPlaying = true;
       this.currentTrack = name;
+      return true;
     }).catch(e => {
       console.error('播放失败:', e);
       this.isPlaying = false;
       this.currentTrack = null;
+      return false;
     });
-
-    this.currentTrack = name;
-    this.isPlaying = true;
-    return true;
   },
 
   pause() {
@@ -78,10 +78,7 @@ CommandRegistry.register({
       Terminal.println(`  当前: ${track}`, '');
       Terminal.println(`  音量: ${Math.round(MusicPlayer.audioEl.volume * 100)}%`, '');
       Terminal.println('');
-      Terminal.println('可用音乐:', 'info');
-      MusicPlayer.listTracks().forEach(name => {
-        Terminal.println(`  ${name}`, '');
-      });
+      Terminal.printList('可用音乐:', MusicPlayer.listTracks());
       Terminal.println('');
       Terminal.println('用法: music play <名称>  |  music pause  |  music stop  |  music volume <0-100>', 'dim');
       return;
@@ -92,9 +89,13 @@ CommandRegistry.register({
     if (subCmd === 'play') {
       if (args.length < 2) {
         if (MusicPlayer.currentTrack) {
-          MusicPlayer.audioEl.play();
-          MusicPlayer.isPlaying = true;
-          Terminal.println(`继续播放: ${MusicPlayer.currentTrack}`, 'success');
+          try {
+            await MusicPlayer.audioEl.play();
+            MusicPlayer.isPlaying = true;
+            Terminal.println(`继续播放: ${MusicPlayer.currentTrack}`, 'success');
+          } catch (e) {
+            Terminal.println('播放失败（浏览器可能阻止了自动播放）', 'error');
+          }
         } else {
           Terminal.println('请指定要播放的音乐', 'error');
           Terminal.println(`可用: ${MusicPlayer.listTracks().join(', ')}`, 'dim');
@@ -102,12 +103,16 @@ CommandRegistry.register({
         return;
       }
       const name = args.slice(1).join(' ');
-      const success = MusicPlayer.play(name);
+      if (!MusicPlayer.tracks[name]) {
+        Terminal.println(`找不到音乐: ${name}`, 'error');
+        Terminal.println(`可用: ${MusicPlayer.listTracks().join(', ')}`, 'dim');
+        return;
+      }
+      const success = await MusicPlayer.play(name);
       if (success) {
         Terminal.println(`正在播放: ${name}`, 'success');
       } else {
-        Terminal.println(`找不到音乐: ${name}`, 'error');
-        Terminal.println(`可用: ${MusicPlayer.listTracks().join(', ')}`, 'dim');
+        Terminal.println('播放失败（浏览器可能阻止了自动播放）', 'error');
       }
       return;
     }
@@ -125,10 +130,7 @@ CommandRegistry.register({
     }
 
     if (subCmd === 'list' || subCmd === 'ls') {
-      Terminal.println('可用音乐:', 'info');
-      MusicPlayer.listTracks().forEach(name => {
-        Terminal.println(`  ${name}`, '');
-      });
+      Terminal.printList('可用音乐:', MusicPlayer.listTracks());
       return;
     }
 

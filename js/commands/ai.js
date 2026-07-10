@@ -5,28 +5,11 @@ const AIManager = {
   isGenerating: false,
   abortController: null,
 
-  config: {
-    baseUrl: 'https://api.siliconflow.cn/v1',
-    model: 'Qwen/Qwen2.5-7B-Instruct'
-  },
-
-  init() {
-    const saved = Storage.get('ai_config', null);
-    if (saved) {
-      this.config = { ...this.config, ...saved };
-    }
-  },
-
-  saveConfig() {
-    Storage.set('ai_config', this.config);
-  },
-
   enterChatMode() {
     this.isInChatMode = true;
     this.messages = [];
     Terminal.println('🤖 已进入 AI 对话模式，输入消息开始对话', 'success');
     Terminal.println('   /exit 退出对话  |  /clear 清空上下文  |  Ctrl+C 中断生成', 'dim');
-    Terminal.println('');
   },
 
   exitChatMode() {
@@ -54,6 +37,9 @@ const AIManager = {
 
     this.messages.push({ role: 'user', content: userMessage });
 
+    // Blank separator goes before the turn (not after the reply) so the
+    // input line sits one row below the latest output
+    Terminal.println('');
     Terminal.printHtml(`<div class="line"><span style="color: var(--info-color);">你:</span> ${Utils.escapeHtml(userMessage)}</div>`);
 
     this.isGenerating = true;
@@ -66,6 +52,11 @@ const AIManager = {
     this.currentAiLine = aiLine.querySelector('.ai-content');
     Terminal.scrollToBottom();
 
+    // Allow Ctrl+C to interrupt generation
+    const offInterrupt = Terminal.onInterrupt(() => {
+      if (this.abortController) this.abortController.abort();
+    });
+
     try {
       this.abortController = new AbortController();
       await this.chatWithProxy();
@@ -74,14 +65,15 @@ const AIManager = {
     } catch (error) {
       if (error.name === 'AbortError') {
         this.currentAiLine.innerHTML += ' <span style="color: var(--warning-color);">[已中断]</span>';
+        this.messages.pop();
       } else {
         Terminal.println(`错误: ${error.message}`, 'error');
         this.messages.pop();
       }
     } finally {
+      offInterrupt();
       this.isGenerating = false;
       this.abortController = null;
-      Terminal.println('');
     }
   },
 
@@ -132,6 +124,8 @@ const AIManager = {
             Terminal.scrollToBottom();
           }
         } catch (e) {
+          // Skip malformed SSE chunks (partial JSON split across reads)
+          console.warn('Skipping malformed SSE chunk:', data.slice(0, 80));
         }
       }
     }
@@ -156,10 +150,26 @@ const AIManager = {
     }
   },
 
-  getStatus() {
+  // Model/baseUrl live on the server; fetch them from /api/health
+  async getStatus() {
+    let model = '未知';
+    let baseUrl = '未知';
+    let hasApiKey = false;
+    try {
+      const response = await fetch('/api/health');
+      if (response.ok) {
+        const health = await response.json();
+        model = health.model || model;
+        baseUrl = health.baseUrl || baseUrl;
+        hasApiKey = !!health.hasApiKey;
+      }
+    } catch (e) {
+      // Server unreachable; return placeholders
+    }
     return {
-      model: this.config.model,
-      baseUrl: this.config.baseUrl,
+      model,
+      baseUrl,
+      hasApiKey,
       inChatMode: this.isInChatMode,
       messageCount: this.messages.length,
       isGenerating: this.isGenerating
@@ -181,10 +191,11 @@ CommandRegistry.register({
     const subCmd = args[0].toLowerCase();
 
     if (subCmd === 'status') {
-      const status = AIManager.getStatus();
+      const status = await AIManager.getStatus();
       Terminal.println('当前状态:', 'info');
       Terminal.println(`  模型: ${status.model}`, '');
       Terminal.println(`  接口地址: ${status.baseUrl}`, '');
+      Terminal.println(`  API Key: ${status.hasApiKey ? '已配置' : '未配置'}`, '');
       Terminal.println(`  对话中: ${status.inChatMode ? '是' : '否'}`, '');
       return;
     }
@@ -195,8 +206,6 @@ CommandRegistry.register({
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  AIManager.init();
-
   Terminal.inputInterceptor = function(input) {
     if (AIManager.isInChatMode) {
       if (AIManager.isGenerating && input.trim() === '') {

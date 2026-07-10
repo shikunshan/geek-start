@@ -6,7 +6,10 @@ const ThemeManager = {
       return false;
     }
 
-    document.body.className = '';
+    // Remove only theme-* classes, preserving anything else on <body>
+    [...document.body.classList]
+      .filter(cls => cls.startsWith('theme-'))
+      .forEach(cls => document.body.classList.remove(cls));
     document.body.classList.add(`theme-${name}`);
     Storage.set('theme', name);
     return true;
@@ -39,10 +42,7 @@ CommandRegistry.register({
       Terminal.println('当前状态:', 'info');
       Terminal.println(`  当前主题: ${current}`, '');
       Terminal.println('');
-      Terminal.println('可用主题:', 'info');
-      ThemeManager.listThemes().forEach(name => {
-        Terminal.println(`  ${name}`, '');
-      });
+      Terminal.printList('可用主题:', ThemeManager.listThemes());
       Terminal.println('');
       Terminal.println('用法: theme <名称>', 'dim');
       return;
@@ -51,10 +51,7 @@ CommandRegistry.register({
     const arg = args[0].toLowerCase();
 
     if (arg === 'list' || arg === 'ls') {
-      Terminal.println('可用主题:', 'info');
-      ThemeManager.listThemes().forEach(name => {
-        Terminal.println(`  ${name}`, '');
-      });
+      Terminal.printList('可用主题:', ThemeManager.listThemes());
       return;
     }
 

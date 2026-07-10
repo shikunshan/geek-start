@@ -26,12 +26,12 @@ CommandRegistry.register({
 
     commands.forEach(cmd => {
       const aliasStr = cmd.alias && cmd.alias.length > 0
-        ? `<span class="help-alias">[${cmd.alias.join(', ')}]</span>`
+        ? `<span class="help-alias">[${Utils.escapeHtml(cmd.alias.join(', '))}]</span>`
         : '';
       Terminal.printHtml(
         `<div class="help-item">` +
-        `<span class="help-name">${cmd.name}</span>` +
-        `<span class="help-desc">${cmd.description} ${aliasStr}</span>` +
+        `<span class="help-name">${Utils.escapeHtml(cmd.name)}</span>` +
+        `<span class="help-desc">${Utils.escapeHtml(cmd.description)} ${aliasStr}</span>` +
         `</div>`
       );
     });

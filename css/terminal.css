@@ -180,27 +180,6 @@ body {
   font-size: 12px;
 }
 
-.bookmark-item {
-  display: flex;
-  gap: 16px;
-  padding: 2px 0;
-}
-
-.bookmark-index {
-  color: var(--dim-color);
-  min-width: 30px;
-}
-
-.bookmark-name {
-  color: var(--info-color);
-  min-width: 150px;
-}
-
-.bookmark-url {
-  color: var(--dim-color);
-  font-size: 13px;
-}
-
 .help-item {
   display: flex;
   gap: 16px;

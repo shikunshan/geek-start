@@ -11,7 +11,10 @@ const Terminal = {
   isProcessing: false,
   inputCallback: null,
   inputInterceptor: null,
-  ctrlCPressed: false,
+  interruptHandlers: [],
+  scrollPending: false,
+
+  MAX_OUTPUT_LINES: 2000,
 
   init() {
     this.outputEl = document.getElementById('terminal-output');
@@ -124,6 +127,15 @@ const Terminal = {
   },
 
   handleCtrlC() {
+    // Let running tasks (animations, AI generation) stop themselves first
+    if (this.interruptHandlers.length > 0) {
+      const handlers = [...this.interruptHandlers];
+      this.interruptHandlers = [];
+      handlers.forEach(fn => {
+        try { fn(); } catch (e) { console.error('interrupt handler error:', e); }
+      });
+    }
+
     this.println('^C', 'error');
     this.currentInput = '';
     this.hiddenInput.value = '';
@@ -131,6 +143,14 @@ const Terminal = {
     this.historyIndex = this.history.length;
 
     this.printPrompt();
+  },
+
+  // Register a callback invoked on Ctrl+C; returns an unregister function
+  onInterrupt(fn) {
+    this.interruptHandlers.push(fn);
+    return () => {
+      this.interruptHandlers = this.interruptHandlers.filter(h => h !== fn);
+    };
   },
 
   addToHistory(cmd) {
@@ -147,7 +167,7 @@ const Terminal = {
     this.inputTextEl.textContent = this.currentInput;
   },
 
-  print(text, className = '') {
+  println(text, className = '') {
     const line = document.createElement('div');
     line.className = 'line ' + className;
     if (typeof text === 'string') {
@@ -155,22 +175,13 @@ const Terminal = {
     } else if (text instanceof HTMLElement) {
       line.appendChild(text);
     }
-    this.outputEl.appendChild(line);
-    this.scrollToBottom();
+    this.appendLine(line);
   },
 
-  println(text, className = '') {
-    this.print(text, className);
-  },
-
-  printElement(element, className = '') {
-    const line = document.createElement('div');
-    line.className = 'line ' + className;
-    if (element instanceof HTMLElement) {
-      line.appendChild(element);
-    }
-    this.outputEl.appendChild(line);
-    this.scrollToBottom();
+  // Print an info title followed by an indented list of items (shared by many commands)
+  printList(title, items) {
+    this.println(title, 'info');
+    items.forEach(item => this.println(`  ${item}`, ''));
   },
 
   printPrompt() {
@@ -182,15 +193,22 @@ const Terminal = {
     const line = document.createElement('div');
     line.className = 'line prompt-line';
     line.innerHTML = `<span style="color: var(--prompt-color);">&gt;</span> <span>${Utils.escapeHtml(input)}</span>`;
-    this.outputEl.appendChild(line);
-    this.scrollToBottom();
+    this.appendLine(line);
   },
 
   printHtml(html, className = '') {
     const line = document.createElement('div');
     line.className = 'line ' + className;
     line.innerHTML = html;
+    this.appendLine(line);
+  },
+
+  // Append a line, cap total output size, and schedule a scroll
+  appendLine(line) {
     this.outputEl.appendChild(line);
+    while (this.outputEl.childElementCount > this.MAX_OUTPUT_LINES) {
+      this.outputEl.removeChild(this.outputEl.firstElementChild);
+    }
     this.scrollToBottom();
   },
 
@@ -202,8 +220,14 @@ const Terminal = {
     this.hiddenInput.focus();
   },
 
+  // Batched via rAF so rapid output (e.g. AI streaming) forces at most one layout per frame
   scrollToBottom() {
-    this.containerEl.scrollTop = this.containerEl.scrollHeight;
+    if (this.scrollPending) return;
+    this.scrollPending = true;
+    requestAnimationFrame(() => {
+      this.scrollPending = false;
+      this.containerEl.scrollTop = this.containerEl.scrollHeight;
+    });
   },
 
   onInput(callback) {
@@ -221,15 +245,14 @@ const GeekStart = {
     if (!config) {
       try {
         const response = await fetch('config/default.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const defaults = await response.json();
         Storage.set('config', defaults);
       } catch (e) {
         Storage.set('config', {
           username: 'geek',
           defaultSearch: 'google',
-          theme: 'default',
-          backgroundInterval: 30000,
-          soundEnabled: false
+          theme: 'default'
         });
       }
     }
@@ -251,12 +274,7 @@ const GeekStart = {
     const username = config.username || 'geek';
 
     Terminal.println('');
-    Terminal.println('  ██████╗ ███████╗███████╗██╗  ██╗███████╗████████╗ █████╗ ██████╗ ████████╗', 'info');
-    Terminal.println('  ██╔══██╗██╔════╝██╔════╝██║ ██╔╝██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝', 'info');
-    Terminal.println('  ██████╔╝█████╗  █████╗  █████╔╝ ███████╗   ██║   ███████║██████╔╝   ██║   ', 'info');
-    Terminal.println('  ██╔══██╗██╔══╝  ██╔══╝  ██╔═██╗ ╚════██║   ██║   ██╔══██║██╔══██╗   ██║   ', 'info');
-    Terminal.println('  ██║  ██║███████╗███████╗██║  ██╗███████║   ██║   ██║  ██║██║  ██║   ██║   ', 'info');
-    Terminal.println('  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ', 'info');
+    Utils.ASCII_BANNER.forEach(line => Terminal.println(`  ${line}`, 'info'));
     Terminal.println('');
 
     Terminal.println(`欢迎回来，${username}！`, 'success');

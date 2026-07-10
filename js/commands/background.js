@@ -1,9 +1,9 @@
 const BackgroundManager = {
   images: {
-    mountain: 'assets/images/mountain.jpg',
-    sea: 'assets/images/sea.jpg',
-    'snow-mountain': 'assets/images/snow-mountain.jpg',
-    snow: 'assets/images/snow.jpg',
+    mountain: 'assets/images/mountain.webp',
+    sea: 'assets/images/sea.webp',
+    'snow-mountain': 'assets/images/snow-mountain.webp',
+    snow: 'assets/images/snow.webp',
     'starry-night': 'assets/images/starry-night.jpg'
   },
 
@@ -17,7 +17,10 @@ const BackgroundManager = {
 
   setImage(name) {
     this.stopRandom();
+    return this.applyImage(name);
+  },
 
+  applyImage(name) {
     if (name === 'none' || !name) {
       this.overlayEl.classList.remove('active');
       this.overlayEl.style.backgroundImage = '';
@@ -30,16 +33,24 @@ const BackgroundManager = {
       return false;
     }
 
-    this.overlayEl.style.backgroundImage = `url('${imagePath}')`;
-    this.overlayEl.classList.add('active');
+    // Preload before swapping to avoid visible pop-in on multi-MB images
+    const img = new Image();
+    img.onload = () => {
+      this.overlayEl.style.backgroundImage = `url('${imagePath}')`;
+      this.overlayEl.classList.add('active');
+    };
+    img.src = imagePath;
     this.currentImage = name;
     return true;
   },
 
   setRandom() {
     const names = Object.keys(this.images);
-    const randomName = Utils.randomFromArray(names);
-    this.setImage(randomName);
+    // Avoid picking the same image twice in a row
+    const candidates = names.filter(n => n !== this.currentImage);
+    const randomName = Utils.randomFromArray(candidates.length ? candidates : names);
+    // applyImage (not setImage) so the rotation interval isn't cancelled by its own tick
+    this.applyImage(randomName);
     return randomName;
   },
 
@@ -78,10 +89,7 @@ CommandRegistry.register({
       Terminal.println('当前状态:', 'info');
       Terminal.println(`  当前背景: ${current}`, '');
       Terminal.println('');
-      Terminal.println('可用背景:', 'info');
-      BackgroundManager.listImages().forEach(name => {
-        Terminal.println(`  ${name}`, '');
-      });
+      Terminal.printList('可用背景:', BackgroundManager.listImages());
       Terminal.println('');
       Terminal.println('  none    - 纯黑背景', '');
       Terminal.println('  random  - 随机轮播', '');
@@ -105,10 +113,7 @@ CommandRegistry.register({
     }
 
     if (arg === 'list' || arg === 'ls') {
-      Terminal.println('可用背景:', 'info');
-      BackgroundManager.listImages().forEach(name => {
-        Terminal.println(`  ${name}`, '');
-      });
+      Terminal.printList('可用背景:', BackgroundManager.listImages());
       return;
     }
 

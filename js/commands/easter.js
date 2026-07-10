@@ -49,6 +49,11 @@ CommandRegistry.register({
     ];
 
     let i = 0;
+    let offInterrupt = null;
+    const stop = () => {
+      clearInterval(interval);
+      if (offInterrupt) offInterrupt();
+    };
     const interval = setInterval(() => {
       if (i < messages.length) {
         Terminal.println(
@@ -57,8 +62,10 @@ CommandRegistry.register({
         );
         i++;
       } else {
-        clearInterval(interval);
+        stop();
       }
     }, 400);
+    // Ctrl+C stops the animation
+    offInterrupt = Terminal.onInterrupt(stop);
   },
 });

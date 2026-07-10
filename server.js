@@ -1,14 +1,38 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.disable('x-powered-by');
+// Behind nginx reverse proxy: trust first hop so rate limiting sees real client IPs
+app.set('trust proxy', 1);
+
+// CORS: same-origin by default; set ALLOWED_ORIGINS (comma-separated) to allow cross-origin access
+if (process.env.ALLOWED_ORIGINS) {
+  const origins = process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim());
+  app.use(cors({ origin: origins }));
+}
+
+app.use(compression());
 app.use(express.json({ limit: '1mb' }));
-app.use(express.static(path.join(__dirname, '.')));
+
+// Static files: whitelist only, never the repo root (.env, node_modules etc. must NOT be reachable)
+const staticOpts = { maxAge: '1h', etag: true };
+const assetOpts = { maxAge: '30d', immutable: true };
+app.use('/js', express.static(path.join(__dirname, 'js'), staticOpts));
+app.use('/css', express.static(path.join(__dirname, 'css'), staticOpts));
+app.use('/assets', express.static(path.join(__dirname, 'assets'), assetOpts));
+app.use('/public', express.static(path.join(__dirname, 'public'), assetOpts));
+app.use('/config', express.static(path.join(__dirname, 'config'), staticOpts));
+app.get('/', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache');
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 const LLM_API_KEY = process.env.LLM_API_KEY;
 const LLM_BASE_URL = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
@@ -24,7 +48,16 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.post('/api/chat', async (req, res) => {
+// Rate limit the chat proxy so strangers can't burn LLM credits
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: parseInt(process.env.CHAT_RATE_LIMIT, 10) || 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: '请求过于频繁，请稍后再试' }
+});
+
+app.post('/api/chat', chatLimiter, async (req, res) => {
   try {
     const { messages, stream = true } = req.body;
 
@@ -33,9 +66,9 @@ app.post('/api/chat', async (req, res) => {
     }
 
     if (!LLM_API_KEY || LLM_API_KEY === 'your-api-key-here') {
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: 'LLM_API_KEY not configured',
-        hint: '请在 .env 文件中配置 LLM_API_KEY，或在前端使用 ai setkey 命令设置 API Key'
+        hint: '请在 .env 文件中配置 LLM_API_KEY'
       });
     }
 
@@ -44,6 +77,12 @@ app.post('/api/chat', async (req, res) => {
       requestMessages.push({ role: 'system', content: LLM_SYSTEM_PROMPT });
     }
     requestMessages.push(...messages);
+
+    // Abort the upstream request if the client disconnects (saves tokens)
+    const upstreamAbort = new AbortController();
+    req.on('close', () => {
+      if (!res.writableEnded) upstreamAbort.abort();
+    });
 
     const response = await fetch(`${LLM_BASE_URL}/chat/completions`, {
       method: 'POST',
@@ -55,7 +94,8 @@ app.post('/api/chat', async (req, res) => {
         model: LLM_MODEL,
         messages: requestMessages,
         stream: stream
-      })
+      }),
+      signal: upstreamAbort.signal
     });
 
     if (!response.ok) {
@@ -68,6 +108,7 @@ app.post('/api/chat', async (req, res) => {
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
+      res.flushHeaders();
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -84,7 +125,7 @@ app.post('/api/chat', async (req, res) => {
         for (const line of lines) {
           const trimmed = line.trim();
           if (!trimmed || !trimmed.startsWith('data:')) continue;
-          
+
           const data = trimmed.slice(5).trim();
           if (data === '[DONE]') {
             res.write('data: [DONE]\n\n');
@@ -99,6 +140,8 @@ app.post('/api/chat', async (req, res) => {
               res.write(`data: ${JSON.stringify({ content })}\n\n`);
             }
           } catch (e) {
+            // Skip malformed SSE chunks (partial JSON split across reads)
+            console.warn('Skipping malformed SSE chunk:', data.slice(0, 80));
           }
         }
       }
@@ -112,8 +155,16 @@ app.post('/api/chat', async (req, res) => {
     }
 
   } catch (error) {
+    if (error.name === 'AbortError') {
+      // Client disconnected mid-stream; nothing to send back
+      return;
+    }
     console.error('Chat API error:', error);
-    res.status(500).json({ error: error.message });
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.end();
+    }
   }
 });
 

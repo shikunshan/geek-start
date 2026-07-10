@@ -97,13 +97,10 @@ CommandRegistry.register({
       Terminal.println('当前状态:', 'info');
       Terminal.println(`  默认引擎: ${defaultEngine.name} (${defaultKey})`, '');
       Terminal.println('');
-      Terminal.println("可用引擎:", "info");
-      SearchEngine.listEngines().forEach((e) => {
-        Terminal.println(
-          `  ${e.key} (${e.prefixes.join(", ")}): ${e.name}`,
-          '',
-        );
-      });
+      Terminal.printList(
+        '可用引擎:',
+        SearchEngine.listEngines().map((e) => `${e.key} (${e.prefixes.join(', ')}): ${e.name}`)
+      );
       Terminal.println('');
       Terminal.println('用法: search <关键词>  |  search <引擎> <关键词>', 'dim');
       return;
